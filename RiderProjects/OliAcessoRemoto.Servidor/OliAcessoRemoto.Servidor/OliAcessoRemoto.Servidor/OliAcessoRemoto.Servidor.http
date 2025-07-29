@@ -1,0 +1,38 @@
+@OliAcessoRemoto.Servidor_HostAddress = https://localhost:7000
+@token =
+
+### Health Check
+GET {{OliAcessoRemoto.Servidor_HostAddress}}/health
+Accept: application/json
+
+### Register Client
+POST {{OliAcessoRemoto.Servidor_HostAddress}}/api/client/register
+Content-Type: application/json
+
+{
+  "name": "Test Client",
+  "connectionInfo": "{\"ip\":\"192.168.1.100\",\"version\":\"1.0.0\"}"
+}
+
+### Get Client Status (requires token)
+GET {{OliAcessoRemoto.Servidor_HostAddress}}/api/client/status/123 456 789
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get Online Clients (requires token)
+GET {{OliAcessoRemoto.Servidor_HostAddress}}/api/client/clients/online
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Request Connection (requires token)
+POST {{OliAcessoRemoto.Servidor_HostAddress}}/api/client/connection/request
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "targetClientId": "123 456 789",
+  "requesterClientId": "987 654 321",
+  "password": "optional_password"
+}
+
+###
