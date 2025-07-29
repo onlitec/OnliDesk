@@ -1,0 +1,18 @@
+# Global owners
+* @onlitec
+
+# Server code
+/RiderProjects/OliAcessoRemoto.Servidor/ @onlitec
+
+# Client code  
+/RiderProjects/OliAcessoRemoto/ @onlitec
+
+# Documentation
+*.md @onlitec
+/docs/ @onlitec
+
+# Configuration files
+/.github/ @onlitec
+*.yml @onlitec
+*.yaml @onlitec
+*.json @onlitec

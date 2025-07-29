@@ -1,0 +1,67 @@
+name: 🚀 Release OnliDesk Server
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  create-release:
+    name: 📦 Create Server Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🏗️ Build and publish server
+      run: |
+        dotnet publish OnliDesk-Server/ \
+          --configuration Release \
+          --output ./release/server/
+          
+    - name: 📦 Create server archive
+      run: |
+        cd release
+        zip -r onlidesk-server-${{ github.ref_name }}.zip server/
+        
+    - name: 📝 Generate release notes
+      id: release_notes
+      run: |
+        echo "## 🎉 OnliDesk Release ${{ github.ref_name }}" > release_notes.md
+        echo "" >> release_notes.md
+        echo "### 📦 Downloads" >> release_notes.md
+        echo "- **Servidor OnliDesk**: onlidesk-server-${{ github.ref_name }}.zip" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "### 🚀 Funcionalidades do Servidor" >> release_notes.md
+        echo "- ✅ Servidor ASP.NET Core 9.0" >> release_notes.md
+        echo "- ✅ API REST completa" >> release_notes.md
+        echo "- ✅ Autenticação JWT" >> release_notes.md
+        echo "- ✅ Banco de dados SQLite" >> release_notes.md
+        echo "- ✅ SignalR Hub para tempo real" >> release_notes.md
+        echo "- ✅ Geração de IDs únicos (XXX XXX XXX)" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "### 📋 Requisitos" >> release_notes.md
+        echo "- .NET 9.0 Runtime (se não usar versão self-contained)" >> release_notes.md
+        echo "- Windows 10+ (para cliente)" >> release_notes.md
+        echo "- Linux/Windows (para servidor)" >> release_notes.md
+        
+    - name: 🚀 Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          release/onlidesk-server-${{ github.ref_name }}.zip
+          release/onlidesk-client-${{ github.ref_name }}.zip
+        body_path: release_notes.md
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

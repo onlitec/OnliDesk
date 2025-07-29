@@ -1,6 +1,6 @@
-# OnliDesk - Sistema de Acesso Remoto
+# 🖥️ OnliDesk Server - Sistema de Acesso Remoto
 
-Sistema completo de acesso remoto desenvolvido pela OnliTec, composto por servidor ASP.NET Core e cliente WPF.
+Servidor ASP.NET Core 9.0 para sistema de acesso remoto OnliDesk desenvolvido pela OnliTec.
 
 ## 🏗️ Arquitetura
 
