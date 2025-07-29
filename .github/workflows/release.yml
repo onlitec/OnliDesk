@@ -22,41 +22,23 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: 🏗️ Build and publish server (Linux)
+    - name: 🏗️ Build and publish server
       run: |
         dotnet publish RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/ \
           --configuration Release \
-          --runtime linux-x64 \
-          --self-contained true \
-          --output ./release/server-linux-x64/ \
-          -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true
-          
-    - name: 🏗️ Build and publish server (Windows)
-      run: |
-        dotnet publish RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/ \
-          --configuration Release \
-          --runtime win-x64 \
-          --self-contained true \
-          --output ./release/server-win-x64/ \
-          -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true
-          
-    - name: 🏗️ Build and publish client (Windows)
+          --output ./release/server/
+
+    - name: 🏗️ Build and publish client
       run: |
         dotnet publish RiderProjects/OliAcessoRemoto/ \
           --configuration Release \
-          --runtime win-x64 \
-          --self-contained true \
-          --output ./release/client-win-x64/ \
-          -p:PublishSingleFile=true
+          --output ./release/client/
           
     - name: 📦 Create archives
       run: |
         cd release
-        tar -czf onlidesk-server-linux-x64-${{ github.ref_name }}.tar.gz server-linux-x64/
-        zip -r onlidesk-server-win-x64-${{ github.ref_name }}.zip server-win-x64/
-        zip -r onlidesk-client-win-x64-${{ github.ref_name }}.zip client-win-x64/
+        zip -r onlidesk-server-${{ github.ref_name }}.zip server/
+        zip -r onlidesk-client-${{ github.ref_name }}.zip client/
         
     - name: 📝 Generate release notes
       id: release_notes
@@ -64,9 +46,8 @@ jobs:
         echo "## 🎉 OnliDesk Release ${{ github.ref_name }}" > release_notes.md
         echo "" >> release_notes.md
         echo "### 📦 Downloads" >> release_notes.md
-        echo "- **Servidor Linux**: onlidesk-server-linux-x64-${{ github.ref_name }}.tar.gz" >> release_notes.md
-        echo "- **Servidor Windows**: onlidesk-server-win-x64-${{ github.ref_name }}.zip" >> release_notes.md
-        echo "- **Cliente Windows**: onlidesk-client-win-x64-${{ github.ref_name }}.zip" >> release_notes.md
+        echo "- **Servidor**: onlidesk-server-${{ github.ref_name }}.zip" >> release_notes.md
+        echo "- **Cliente**: onlidesk-client-${{ github.ref_name }}.zip" >> release_notes.md
         echo "" >> release_notes.md
         echo "### 🚀 Funcionalidades" >> release_notes.md
         echo "- ✅ Servidor ASP.NET Core 9.0" >> release_notes.md
@@ -85,9 +66,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          release/onlidesk-server-linux-x64-${{ github.ref_name }}.tar.gz
-          release/onlidesk-server-win-x64-${{ github.ref_name }}.zip
-          release/onlidesk-client-win-x64-${{ github.ref_name }}.zip
+          release/onlidesk-server-${{ github.ref_name }}.zip
+          release/onlidesk-client-${{ github.ref_name }}.zip
         body_path: release_notes.md
         draft: false
         prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
