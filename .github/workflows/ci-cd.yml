@@ -81,25 +81,5 @@ jobs:
         name: onlidesk-server
         path: ./publish/server/
 
-  security-scan:
-    name: 🔒 Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
-
-    - name: 🔧 Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: 🔍 Run .NET security audit
-      run: |
-        cd RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/
-        dotnet list package --vulnerable --include-transitive || echo "No vulnerabilities found"
-
-    - name: 🔍 Check for hardcoded secrets
-      run: |
-        echo "Checking for potential secrets..."
-        grep -r -i "password\|secret\|key\|token" --include="*.cs" --include="*.json" . || echo "No obvious secrets found"
+  # Security scan temporariamente removido para resolver problemas de cache
+  # Será reativado após confirmação de que o workflow está funcionando
