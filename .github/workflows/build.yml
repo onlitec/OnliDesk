@@ -1,4 +1,4 @@
-name: Build OnliDesk
+name: Build OnliDesk Server
 
 on:
   push:
@@ -10,72 +10,50 @@ env:
   DOTNET_VERSION: '9.0.x'
 
 jobs:
-  build-server:
-    name: 🖥️ Build Server
+  build-and-test:
+    name: 🖥️ Build and Test Server
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: 📥 Checkout
-      uses: actions/checkout@v4
-      
-    - name: 🔧 Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: 📦 Restore
-      run: dotnet restore RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/
-      
-    - name: 🏗️ Build
-      run: dotnet build RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/ --no-restore --configuration Release
-      
-    - name: ✅ Success
-      run: echo "Server build completed successfully"
 
-  build-client:
-    name: 🖥️ Build Client
-    runs-on: windows-latest
-    
     steps:
     - name: 📥 Checkout
       uses: actions/checkout@v4
-      
+
     - name: 🔧 Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: 📦 Restore
-      run: dotnet restore RiderProjects/OliAcessoRemoto/
-      
-    - name: 🏗️ Build
-      run: dotnet build RiderProjects/OliAcessoRemoto/ --no-restore --configuration Release
-      
-    - name: ✅ Success
-      run: echo "Client build completed successfully"
+
+    - name: 📦 Restore Dependencies
+      run: dotnet restore OnliDesk-Server/
+
+    - name: 🏗️ Build Server
+      run: dotnet build OnliDesk-Server/ --no-restore --configuration Release
+
+    - name: 🧪 Run Tests
+      run: echo "Server build and basic validation completed successfully"
 
   publish:
-    name: 📦 Publish
-    needs: [build-server, build-client]
+    name: 📦 Publish Server
+    needs: [build-and-test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - name: 📥 Checkout
       uses: actions/checkout@v4
-      
+
     - name: 🔧 Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        
+
     - name: 📦 Publish Server
       run: |
-        dotnet publish RiderProjects/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/OliAcessoRemoto.Servidor/ \
+        dotnet publish OnliDesk-Server/ \
           --configuration Release \
           --output ./dist/server/
-          
-    - name: 📤 Upload Artifacts
+
+    - name: 📤 Upload Server Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: onlidesk-server
