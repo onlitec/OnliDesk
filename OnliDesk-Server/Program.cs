@@ -86,8 +86,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 Console.WriteLine("🚀 OnliDesk Server starting...");
-Console.WriteLine($"🌐 Server will be available at: http://localhost:5165");
-Console.WriteLine($"📊 Health check: http://localhost:5165/health");
-Console.WriteLine($"📚 API Documentation: http://localhost:5165/swagger");
+Console.WriteLine("🌐 Server will be available at: http://localhost:5000");
+Console.WriteLine("📊 Health check: http://localhost:5000/health");
+Console.WriteLine("📚 API Documentation: http://localhost:5000/swagger");
 
 app.Run();
