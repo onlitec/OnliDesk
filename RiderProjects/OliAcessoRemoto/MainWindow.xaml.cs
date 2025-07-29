@@ -1,15 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using OliAcessoRemoto.Models;
 using OliAcessoRemoto.Services;
 
 namespace OliAcessoRemoto;
@@ -23,7 +15,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool _isConnected = false;
     private string _localId = "000 000 000";
     private string? _authToken;
-    private readonly IServerApiService _serverApi;
+    private readonly IServerApiService? _serverApi;
 
     public ObservableCollection<RecentConnection> RecentConnections { get; set; } = new();
 
@@ -31,8 +23,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         try
         {
-            _serverApi = new ServerApiService();
             InitializeComponent();
+            _serverApi = new ServerApiService();
             InitializeData();
             UpdateUI();
             _ = InitializeServerConnectionAsync();
@@ -64,6 +56,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         try
         {
+            if (_serverApi == null) return;
+
             // Verificar se o servidor está online
             FooterStatusText.Text = "Verificando conexão com servidor...";
 
@@ -109,6 +103,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         UpdateUI();
+    }
+
+    private void ConnectButton_Click(object sender, RoutedEventArgs e)
+    {
+        ConnectToRemote();
     }
 
     private void GenerateLocalId()
@@ -178,6 +177,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             try
             {
+                if (_serverApi == null)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        FooterStatusText.Text = "Servidor não disponível";
+                        MessageBox.Show("Servidor não está disponível. Tente novamente mais tarde.",
+                                      "Servidor Indisponível", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        ConnectButton.IsEnabled = true;
+                        ConnectButton.Content = "Conectar";
+                    });
+                    return;
+                }
+
                 // Verificar se o cliente de destino está online
                 var targetStatus = await _serverApi.GetClientStatusAsync(remoteId);
                 if (targetStatus == null || !targetStatus.IsOnline)
